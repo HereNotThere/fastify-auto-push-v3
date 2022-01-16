@@ -66,7 +66,8 @@ export async function staticServeFn<
   const prefix = opts.prefix || "/";
   const ap = new autoPush.AutoPush(root, opts.cacheConfig);
 
-  app.register(fastifyStatic, opts);
+  const fastifyStaticOpts = { ...opts, preCompressed: true };
+  app.register(fastifyStatic, fastifyStaticOpts);
 
   app.addHook("onRequest", async (req, res) => {
     // Used for compatibility with fastify 1.x and 2.0

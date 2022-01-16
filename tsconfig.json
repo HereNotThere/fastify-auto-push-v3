@@ -3,17 +3,12 @@
   "compilerOptions": {
     "rootDir": "ts",
     "outDir": "build",
-    "target": "es2017",
-    "lib": [
-      "es2017"
-    ],
+    "module": "CommonJS",
+    "target": "ES2021",
+    "lib": ["ES2021"],
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": [
-    "ts/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["ts/**/*.ts"],
+  "exclude": ["node_modules"]
 }

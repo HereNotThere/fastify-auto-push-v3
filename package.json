@@ -9,7 +9,8 @@
     "CONTRIBUTING.md",
     "LICENSE",
     "README.md",
-    "build/src"
+    "build/src",
+    "ts/src"
   ],
   "scripts": {
     "test": "nyc ava",

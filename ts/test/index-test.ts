@@ -23,13 +23,9 @@ import fastify, {
 import fp from "fastify-plugin";
 import * as http from "http";
 import * as http2 from "http2";
-import { fileURLToPath } from "node:url";
 import * as path from "path";
-import { dirname } from "path";
 
 import { AutoPushOptions, HttpServer, staticServe } from "../src/index.js";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 async function setUpServer<
   Server extends HttpServer,

@@ -2,7 +2,6 @@
   "name": "fastify-auto-push",
   "version": "0.4.0",
   "description": "HTTP/2 auto-push middleware for fastify",
-  "type": "module",
   "main": "build/src/index.js",
   "types": "build/src/index",
   "files": [

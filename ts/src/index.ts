@@ -24,7 +24,9 @@ import fp from "fastify-plugin";
 import fastifyStatic from "fastify-static";
 import * as autoPush from "h2-auto-push";
 import * as http from "http";
+import { IncomingMessage } from "http";
 import * as http2 from "http2";
+import { Http2ServerRequest } from "http2";
 import * as https from "https";
 
 export { AssetCacheConfig } from "h2-auto-push";
@@ -43,7 +45,9 @@ export interface AutoPushOptions extends fastify.RegisterOptions {
   cacheConfig?: autoPush.AssetCacheConfig;
 }
 
-function isHttp2Request(req: RawRequest): req is http2.Http2ServerRequest {
+function isHttp2Request(
+  req: IncomingMessage | Http2ServerRequest
+): req is http2.Http2ServerRequest {
   return !!(req as http2.Http2ServerRequest).stream;
 }
 
@@ -70,12 +74,11 @@ export async function staticServeFn<
   app.register(fastifyStatic, fastifyStaticOpts);
 
   app.addHook("onRequest", async (req, res) => {
-    // Used for compatibility with fastify 1.x and 2.0
-    const rawRequest = req.raw || req;
-    const rawResponse = res.raw || res;
-    if (isHttp2Request(rawRequest)) {
+    const rawRequest = req.raw;
+    const rawResponse = res.raw;
+    if (isHttp2Request(req.raw)) {
       const reqPath = rawRequest.url;
-      const reqStream = rawRequest.stream;
+      const reqStream = req.raw.stream;
       const cookies = cookie.parse(
         (rawRequest.headers["cookie"] as string) || ""
       );
@@ -90,15 +93,15 @@ export async function staticServeFn<
         "set-cookie",
         cookie.serialize(CACHE_COOKIE_KEY, newCacheCookie, { path: "/" })
       );
+      await pushFn();
 
       reqStream.on("pushError", (err) => {
         req.log?.error("Error while pushing", err);
       });
-      pushFn().then(noop, noop);
     }
   });
 
-  app.addHook("onSend", async (request, reply) => {
+  app.addHook("onSend", (request, reply, payload, done) => {
     const raw = reply.raw;
     if (isHttp2Response(raw)) {
       const statusCode = raw.statusCode;
@@ -116,11 +119,9 @@ export async function staticServeFn<
         ap.recordRequestPath(resStream.session, reqPath, true);
       }
     }
+    done();
   });
 }
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-function noop() {}
 
 // This type is probably not useful. Users probably want to call fp to
 // instantiate the plugin specifically for their specific Http server, request

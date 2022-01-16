@@ -23,16 +23,20 @@ import fastify, {
 import fp from "fastify-plugin";
 import * as http from "http";
 import * as http2 from "http2";
+import { fileURLToPath } from "node:url";
 import * as path from "path";
+import { dirname } from "path";
 
-import { AutoPushOptions, HttpServer, staticServeFn } from "../src/index";
+import { AutoPushOptions, HttpServer, staticServe } from "../src/index.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 async function setUpServer<
   Server extends HttpServer,
   Request extends RawRequestDefaultExpression<Server>,
   Response extends RawReplyDefaultExpression<Server>
 >(app: FastifyInstance<Server, Request, Response>, port: number) {
-  app.register(fp<AutoPushOptions>(staticServeFn), {
+  app.register(fp<AutoPushOptions>(staticServe), {
     root: path.join(__dirname, "..", "..", "ts", "test", "static"),
   });
   await app.listen(port);
@@ -74,9 +78,7 @@ function http1FetchFile(port: number, path: string): Promise<string> {
   });
 }
 
-test("http2 static file serving", async (t: {
-  true: (arg0: boolean) => void;
-}) => {
+test("http2 static file serving", async (t) => {
   /*
    * Const getPort = require("get-port");
    *   const getPort = (await import("get-port")).default;
@@ -88,13 +90,13 @@ test("http2 static file serving", async (t: {
 
   const data = await http2FetchFile(port, "/test.html");
   t.true(data.includes("This is a test document."));
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  app.close(() => {});
+  const closed = await new Promise<boolean>((resolve) => {
+    app.close(() => resolve(true));
+  });
+  t.true(closed);
 });
 
-test("http1 static file serving", async (t: {
-  true: (arg0: boolean) => void;
-}) => {
+test("http1 static file serving", async (t) => {
   // Const getPort = 9090;//require("get-port");
 
   //  Const getPort = (await import("get-port")).default;
@@ -106,6 +108,8 @@ test("http1 static file serving", async (t: {
 
   const data = await http1FetchFile(port, "/test.html");
   t.true(data.includes("This is a test document."));
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  app.close(() => {});
+  const closed = await new Promise<boolean>((resolve) => {
+    app.close(() => resolve(true));
+  });
+  t.true(closed);
 });

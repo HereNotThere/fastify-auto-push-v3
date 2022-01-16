@@ -20,6 +20,7 @@ import {
   RawRequestDefaultExpression,
   RawServerBase,
 } from "fastify";
+import fp from "fastify-plugin";
 import fastifyStatic from "fastify-static";
 import * as autoPush from "h2-auto-push";
 import * as http from "http";
@@ -123,11 +124,4 @@ function noop() {}
 // This type is probably not useful. Users probably want to call fp to
 // instantiate the plugin specifically for their specific Http server, request
 // and response types rather than using the union types like we do here.
-/*
-export const staticServe = fp<
-  HttpServer,
-  RawRequest,
-  RawResponse,
-  AutoPushOptions<HttpServer, RawRequest, RawResponse>
->(staticServeFn);
-*/
+export const staticServe = fp<AutoPushOptions>(staticServeFn);

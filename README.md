@@ -3,8 +3,8 @@
 **This is not an official Google product.**
 
 [HTTP/2](https://tools.ietf.org/html/rfc7540) is a major revision of the HTTP
-protocol. One of its differences from HTTP/1 is [*server
-push*](https://tools.ietf.org/html/rfc7540#section-8.2), which allows a
+protocol. One of its differences from HTTP/1 is [_server
+push_](https://tools.ietf.org/html/rfc7540#section-8.2), which allows a
 server to pre-emptively send responses to a client in association with a
 previous client-initiated request. This can be useful when the server knows
 the client will need to have those responses available in order to fully

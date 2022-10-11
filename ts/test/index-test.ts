@@ -35,8 +35,7 @@ async function setUpServer<
   app.register(fp<AutoPushOptions>(staticServe), {
     root: path.join(__dirname, "..", "..", "ts", "test", "static"),
   });
-  await app.listen(port);
-  return app;
+  return app.listen({ port: port });
 }
 
 function http2FetchFile(port: number, path: string): Promise<string> {
@@ -81,7 +80,7 @@ test("http2 static file serving", async (t) => {
    */
 
   const port = 9092; // Await getPort();
-  const app = fastify({ http2: true });
+  const app = fastify({ http2: true, http2SessionTimeout: 10 });
   await setUpServer(app, port);
 
   const data = await http2FetchFile(port, "/test.html");

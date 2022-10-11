@@ -15,7 +15,7 @@
 const { ArgumentParser } = require("argparse");
 const fastify = require("fastify");
 const fastifyAutoPush = require("fastify-auto-push");
-const fastifyStatic = require("fastify-static");
+const fastifyStatic = require("@fastify/static");
 const fs = require("fs");
 const path = require("path");
 const { promisify } = require("util");
@@ -23,25 +23,23 @@ const { promisify } = require("util");
 const { description, version } = require("./package.json");
 
 const argParser = new ArgumentParser({
-  version,
   description,
-  addHelp: true,
+  add_help: true,
 });
-argParser.addArgument(["--port", "-p"], {
+argParser.add_argument("--port", "-p", {
   type: Number,
-  defaultValue: 3000,
+  default: 3000,
   help: "Port number. Defaults to 3000.",
 });
-argParser.addArgument(["--http2", "--h2"], {
-  nargs: 0,
+argParser.add_argument("--http2", "--h2", {
+  default: true,
   help: "Use HTTP/2. Defaults to true.",
 });
-argParser.addArgument(["--auto-push", "--ap"], {
-  nargs: 0,
+argParser.add_argument("--auto-push", "--ap", {
   dest: "autoPush",
   help: "Enable auto-push. Works only with --http2.",
 });
-const args = argParser.parseArgs();
+const args = argParser.parse_args();
 if (args.autoPush && !args.http2) {
   console.warn("--auto-push is supported only with --http2. Ignoring.");
   args.autoPush = false;
@@ -76,7 +74,7 @@ async function main() {
   } else {
     app.register(fastifyStatic, { root: STATIC_DIR });
   }
-  app.listen(args.port, (err) => {
+  app.listen({ port: args.port }, (err) => {
     if (err) throw err;
     console.log(`Listening on port ${args.port}`);
   });

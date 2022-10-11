@@ -21,7 +21,7 @@ import {
   RawServerBase,
 } from "fastify";
 import fp from "fastify-plugin";
-import fastifyStatic from "fastify-static";
+import fastifyStatic from "@fastify/static";
 import * as autoPush from "h2-auto-push";
 import * as http from "http";
 import { IncomingMessage } from "http";
